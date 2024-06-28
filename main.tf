@@ -14,7 +14,7 @@ resource "docker_image" "nodered_image" {
 }
 
 resource "random_string" "random1"{
-  count = 2
+  count = 1
   length = 4
   special = false
   upper = false
@@ -30,7 +30,7 @@ resource "random_string" "random1"{
 
 
 resource "docker_container" "nodered_container" {
-  count = 2
+  count = 1
   name  = join("-",["nodered",random_string.random1[count.index].result])
   image = docker_image.nodered_image.image_id
   ports {
@@ -38,15 +38,6 @@ resource "docker_container" "nodered_container" {
     //external = 1880
   }
 }
-
-# resource "docker_container" "nodered_container2" {
-#   name  = join("-",["nodered2", random_string.random2.result])
-#   image = docker_image.nodered_image.image_id
-#   ports {
-#     internal = 1880
-#     //external = 1880
-#   }
-# }
 
 
 output "conainer-name" {
