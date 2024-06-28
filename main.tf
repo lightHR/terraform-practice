@@ -27,6 +27,15 @@ resource "random_string" "random1" {
   numeric = false
 }
 
+# resource "docker_container" "nodered_container1" {
+# name = "nodered-zydb"
+# image = docker_image.nodered_image.image_id 
+# }
+
+# resource "docker_container" "nodered_container2" {
+# name = "nodered-kgom"
+# image = docker_image.nodered_image.image_id 
+# }
 
 resource "docker_container" "nodered_container" {
   count = local.container_count
