@@ -1,6 +1,6 @@
 variable "image" {
   type        = map(any)
-  description = "impage for container"
+  description = "image for container"
   default = {
   nodered ={
     dev  = "nodered/node-red:latest"

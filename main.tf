@@ -1,12 +1,21 @@
-module "nodered_image" {
-  source ="./image"
-  image_in = var.image["nodered"][terraform.workspace]
+locals {
+  deployment = {
+    nodered = {
+      image = var.image["nodered"][terraform.workspace]
+    }
+    influxdb = {
+      image = var.image["influxdb"][terraform.workspace]
+    }
+  }
 }
 
-module "influxdb_image" {
+
+module "image" {
   source ="./image"
-  image_in = var.image["influxdb"][terraform.workspace]
+  for_each = local.deployment
+  image_in = each.value.image
 }
+
 
 resource "random_string" "random1" {
   count   = local.container_count
@@ -30,7 +39,7 @@ module "container" {
   source = "./container"
   count = local.container_count
   name_in  = join("-", ["nodered", terraform.workspace, random_string.random1[count.index].result])
-  image_in = module.nodered_image.image_out
+  image_in = module.image["nodered"].image_out
   int_port_in = var.int_port
   # external = lookup(var.ext_port,terraform.workspace)[count.index]
   ext_port_in = var.ext_port[terraform.workspace][count.index]
