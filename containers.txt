@@ -1,0 +1,5 @@
+influxdb-dev-buai: 172.17.0.2:8187
+nodered-dev-qfpu: 172.17.0.3:1980
+influxdb-dev-qtkm: 172.17.0.4:8186
+grafana-dev-ytsq: 172.17.0.5:3101
+grafana-dev-jceb: 172.17.0.6:3100
