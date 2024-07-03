@@ -1,7 +1,7 @@
 
 
 resource "random_string" "random1" {
-  count = var.count_in
+  count   = var.count_in
   length  = 4
   special = false
   upper   = false
@@ -17,34 +17,37 @@ resource "docker_container" "app_container" {
     # external = lookup(var.ext_port,terraform.workspace)[count.index]
     external = var.ext_port_in[count.index]
   }
-  volumes {
-    container_path = var.container_path_in
-    volume_name = docker_volume.container_volume[count.index].name
+  dynamic "volumes" {
+    for_each = var.volumes_in
+    content {
+    container_path = volumes.value["container_path_each"]
+    volume_name    = docker_volume.container_volume[volumes.key].name
+    }
   }
   provisioner "local-exec" {
     //command = "echo ${for x in docker_container.app_container[*]: x.name => join(":",x.network_data[*].ip_address,x.ports["external"])}"
-    command = "echo ${self.name}: ${self.network_data[0].ip_address}:${join(":",[for x in self.ports[*]["external"]: x])} >> containers.txt"
+    command = "echo ${self.name}: ${self.network_data[0].ip_address}:${join(":", [for x in self.ports[*]["external"] : x])} >> containers.txt"
   }
   provisioner "local-exec" {
-    when = destroy
+    when    = destroy
     command = "rm -f containers.txt"
   }
 }
 
 resource "docker_volume" "container_volume" {
-  count = var.count_in
-  name = "${var.name_in}-${random_string.random1[count.index].result}-volume"
+  count = length(var.volumes_in)
+  name  = "${var.name_in}-${count.index}-volume"
   lifecycle {
     prevent_destroy = false
   }
   provisioner "local-exec" {
-    when = destroy
-    command = "mkdir ${path.cwd}/../backup/"
+    when       = destroy
+    command    = "mkdir ${path.cwd}/../backup/"
     on_failure = continue
   }
   provisioner "local-exec" {
-    when = destroy
-    command = "sudo tar -czvf ${path.cwd}/../backup/${self.name}.tar.gz ${self.mountpoint}/"
+    when       = destroy
+    command    = "sudo tar -czvf ${path.cwd}/../backup/${self.name}.tar.gz ${self.mountpoint}/"
     on_failure = fail
   }
 }
