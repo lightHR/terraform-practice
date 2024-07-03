@@ -8,3 +8,6 @@
 #   description = "The ip address for the container2."
 # }
 
+output app_access {
+    value = [for x in module.container[*]:x]
+}
